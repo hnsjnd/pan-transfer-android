@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public String getAppVersion() {
-            return "1.0.0";
+            return "1.1.0";
         }
     }
 

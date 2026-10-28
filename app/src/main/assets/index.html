@@ -7,140 +7,253 @@
 <title>网盘转存</title>
 <style>
   :root {
-    --bg: #0f172a;
-    --bg2: #1e293b;
-    --bg3: #334155;
-    --card: #1e293b;
-    --text: #f1f5f9;
+    --bg: #060910;
+    --bg-elevated: #0c1320;
+    --card: #111827;
+    --card-border: rgba(148, 163, 184, 0.14);
+    --card-shine: rgba(255, 255, 255, 0.05);
+    --text: #f8fafc;
     --muted: #94a3b8;
+    --muted2: #64748b;
     --primary: #3b82f6;
+    --primary-2: #6366f1;
     --primary-press: #2563eb;
-    --ok: #22c55e;
-    --warn: #f59e0b;
-    --danger: #ef4444;
-    --baidu: #2932e1;
-    --ali: #ff6a00;
-    --quark: #0d9488;
-    --uc: #f97316;
-    --radius: 14px;
-    --pad: 16px;
+    --primary-glow: rgba(59, 130, 246, 0.42);
+    --ok: #34d399;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --baidu: #3b45f0;
+    --baidu-soft: rgba(59, 69, 240, 0.2);
+    --ali: #ff7a1a;
+    --ali-soft: rgba(255, 122, 26, 0.2);
+    --quark: #14b8a6;
+    --quark-soft: rgba(20, 184, 166, 0.2);
+    --uc: #fb923c;
+    --uc-soft: rgba(251, 146, 60, 0.2);
+    --radius: 20px;
+    --radius-sm: 14px;
+    --pad: 18px;
+    --touch: 48px;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
     margin: 0; padding: 0;
     background: var(--bg); color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    font-size: 15px; line-height: 1.45;
+    font-size: 15px; line-height: 1.55;
     min-height: 100%;
   }
-  body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
-  .wrap { max-width: 480px; margin: 0 auto; padding: 12px 14px 28px; }
+  body {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) calc(env(safe-area-inset-bottom) + 8px) env(safe-area-inset-left);
+    background:
+      radial-gradient(1100px 480px at 8% -12%, rgba(59, 130, 246, 0.22), transparent 55%),
+      radial-gradient(800px 400px at 100% 0%, rgba(99, 102, 241, 0.14), transparent 48%),
+      radial-gradient(600px 300px at 50% 100%, rgba(20, 184, 166, 0.06), transparent 55%),
+      var(--bg);
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 12px 16px 40px; }
+
   header.appbar {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 2px 14px;
+    display: flex; align-items: center; gap: 14px;
+    padding: 8px 2px 18px;
   }
   .logo {
-    width: 40px; height: 40px; border-radius: 12px;
-    background: linear-gradient(135deg, #3b82f6, #6366f1);
-    display: grid; place-items: center; font-size: 20px; flex-shrink: 0;
+    width: 52px; height: 52px; border-radius: 16px;
+    background: linear-gradient(145deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+    display: grid; place-items: center; font-size: 24px; flex-shrink: 0;
+    box-shadow: 0 10px 28px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.28);
   }
-  .titles h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0.02em; }
-  .titles p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+  .titles { flex: 1; min-width: 0; }
+  .titles h1 {
+    margin: 0; font-size: 22px; font-weight: 800;
+    letter-spacing: 0.01em;
+    background: linear-gradient(90deg, #f8fafc, #c7d2fe);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .titles p { margin: 4px 0 0; color: var(--muted); font-size: 12.5px; }
+  .ver-pill {
+    flex-shrink: 0;
+    font-size: 11px; font-weight: 700; color: #c7d2fe;
+    background: rgba(99, 102, 241, 0.18);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    border-radius: 999px; padding: 7px 12px;
+  }
+
   .card {
-    background: var(--card); border: 1px solid #33415555;
-    border-radius: var(--radius); padding: var(--pad); margin-bottom: 12px;
-    box-shadow: 0 1px 0 #ffffff08 inset;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.045), transparent 42%),
+      var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: var(--pad);
+    margin-bottom: 16px;
+    box-shadow:
+      0 1px 0 var(--card-shine) inset,
+      0 12px 36px rgba(0,0,0,0.28),
+      0 2px 8px rgba(0,0,0,0.18);
   }
   .label {
-    font-size: 12px; color: var(--muted); font-weight: 600;
-    margin-bottom: 8px; letter-spacing: 0.04em;
+    font-size: 12px; color: var(--muted); font-weight: 700;
+    margin-bottom: 12px; letter-spacing: 0.08em;
   }
+  .section-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin-bottom: 4px;
+  }
+  .section-head h2 { margin: 0; font-size: 16px; font-weight: 750; }
+
+  .tip {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(251, 191, 36, 0.04));
+    border: 1px solid rgba(251, 191, 36, 0.32);
+    color: #fde68a; border-radius: 16px; padding: 14px 16px;
+    font-size: 12.5px; line-height: 1.6; margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+  .tip .tip-icon {
+    width: 30px; height: 30px; border-radius: 10px; flex-shrink: 0;
+    background: rgba(251, 191, 36, 0.22); display: grid; place-items: center; font-size: 15px;
+  }
+  .tip strong { color: #fbbf24; }
+
   textarea#shareInput {
-    width: 100%; min-height: 120px; resize: vertical;
-    background: #0b1220; color: var(--text);
-    border: 1px solid var(--bg3); border-radius: 12px;
-    padding: 12px; font-size: 14px; line-height: 1.5;
+    width: 100%; min-height: 140px; resize: vertical;
+    background: var(--bg-elevated); color: var(--text);
+    border: 1px solid rgba(148,163,184,0.2); border-radius: 16px;
+    padding: 14px 16px; font-size: 14.5px; line-height: 1.6;
     outline: none; font-family: inherit;
+    transition: border-color .15s, box-shadow .15s;
   }
-  textarea#shareInput:focus { border-color: var(--primary); box-shadow: 0 0 0 3px #3b82f633; }
-  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  textarea#shareInput:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-glow);
+  }
+  textarea#shareInput::placeholder { color: var(--muted2); }
+
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
   .btn {
     appearance: none; border: none; cursor: pointer;
-    border-radius: 10px; padding: 10px 14px;
-    font-size: 13px; font-weight: 600; color: #fff;
-    background: var(--bg3); transition: transform .08s, opacity .15s, background .15s;
+    border-radius: 14px; padding: 13px 16px; min-height: var(--touch);
+    font-size: 14px; font-weight: 700; color: #fff;
+    background: #1e293b; transition: transform .08s, opacity .15s, background .15s, box-shadow .15s;
     flex: 1 1 auto; min-width: 0; text-align: center;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   }
-  .btn:active { transform: scale(0.97); opacity: 0.9; }
-  .btn.primary { background: var(--primary); }
+  .btn:active { transform: scale(0.97); opacity: 0.92; }
+  .btn.primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+    box-shadow: 0 10px 28px var(--primary-glow), inset 0 1px 0 rgba(255,255,255,0.2);
+    font-size: 15px; font-weight: 800; letter-spacing: 0.02em;
+    flex: 1 1 100%;
+  }
   .btn.primary:active { background: var(--primary-press); }
-  .btn.ghost { background: transparent; border: 1px solid var(--bg3); color: var(--text); }
-  .btn:disabled { opacity: 0.4; pointer-events: none; }
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
-  .chip {
-    border: 1px solid var(--bg3); background: #0b1220; color: var(--muted);
-    border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600;
-    cursor: pointer;
+  .btn.ghost {
+    background: transparent; border: 1px solid rgba(148,163,184,0.24); color: var(--text);
   }
-  .chip.active { color: #fff; border-color: transparent; }
-  .chip[data-disk="ali"].active { background: var(--ali); }
-  .chip[data-disk="baidu"].active { background: var(--baidu); }
-  .chip[data-disk="quark"].active { background: var(--quark); }
+  .btn.soft {
+    background: rgba(59, 130, 246, 0.14); color: #bfdbfe;
+    border: 1px solid rgba(59, 130, 246, 0.32);
+  }
+  .btn:disabled { opacity: 0.4; pointer-events: none; }
+  .btn.compact { flex: 0 0 auto; min-height: 36px; padding: 6px 12px; font-size: 12px; }
+
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip {
+    border: 1px solid transparent; background: var(--bg-elevated);
+    color: var(--muted); border-radius: 999px; padding: 11px 16px;
+    min-height: 42px; font-size: 13px; font-weight: 750; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: background .15s, color .15s, border-color .15s, box-shadow .15s, transform .08s;
+  }
+  .chip:active { transform: scale(0.97); }
+  .chip .dot {
+    width: 9px; height: 9px; border-radius: 50%; background: currentColor; opacity: 0.7;
+  }
+  .chip.active { color: #fff; border-color: transparent; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+  .chip.active .dot { opacity: 1; background: #fff; }
+  .chip[data-disk="ali"].active { background: linear-gradient(135deg, #ff8a3d, var(--ali)); }
+  .chip[data-disk="baidu"].active { background: linear-gradient(135deg, #5b63f5, var(--baidu)); }
+  .chip[data-disk="quark"].active { background: linear-gradient(135deg, #2dd4bf, var(--quark)); }
+  .chip[data-disk="ali"]:not(.active) {
+    background: var(--ali-soft); color: #ffb07a; border-color: rgba(255,122,26,0.35);
+  }
+  .chip[data-disk="baidu"]:not(.active) {
+    background: var(--baidu-soft); color: #a5abff; border-color: rgba(59,69,240,0.35);
+  }
+  .chip[data-disk="quark"]:not(.active) {
+    background: var(--quark-soft); color: #5eead4; border-color: rgba(20,184,166,0.35);
+  }
+
   .result-grid { display: grid; gap: 10px; }
   .field {
-    background: #0b1220; border-radius: 10px; padding: 10px 12px;
-    border: 1px solid #33415544;
+    background: var(--bg-elevated); border-radius: 14px; padding: 13px 15px;
+    border: 1px solid rgba(148,163,184,0.14);
   }
-  .field .k { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .field .k { font-size: 11px; color: var(--muted); margin-bottom: 6px; font-weight: 700; letter-spacing: 0.05em; }
   .field .v {
-    font-size: 13px; word-break: break-all; color: var(--text);
+    font-size: 13.5px; word-break: break-all; color: var(--text);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
+
   .badge {
     display: inline-flex; align-items: center; gap: 6px;
-    border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700;
-    color: #fff;
+    border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 800;
+    color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   }
-  .badge.baidu { background: var(--baidu); }
-  .badge.ali { background: var(--ali); }
-  .badge.quark { background: var(--quark); }
-  .badge.uc { background: var(--uc); }
+  .badge.baidu { background: linear-gradient(135deg, #5b63f5, var(--baidu)); }
+  .badge.ali { background: linear-gradient(135deg, #ff8a3d, var(--ali)); }
+  .badge.quark { background: linear-gradient(135deg, #2dd4bf, var(--quark)); }
+  .badge.uc { background: linear-gradient(135deg, #fdba74, var(--uc)); }
   .badge.unknown { background: #64748b; }
-  .note {
-    background: #42200655; border: 1px solid #f59e0b44;
-    color: #fde68a; border-radius: 12px; padding: 12px 14px;
-    font-size: 12.5px; line-height: 1.55;
-  }
-  .note strong { color: #fbbf24; }
+
   .hist-item {
     display: flex; gap: 10px; align-items: flex-start;
-    padding: 12px 0; border-bottom: 1px solid #33415544;
+    padding: 14px 0; border-bottom: 1px solid rgba(148,163,184,0.1);
   }
   .hist-item:last-child { border-bottom: none; padding-bottom: 0; }
   .hist-body { flex: 1; min-width: 0; cursor: pointer; }
-  .hist-body .meta { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; flex-wrap: wrap; }
+  .hist-body .meta { display: flex; gap: 8px; align-items: center; margin-bottom: 7px; flex-wrap: wrap; }
   .hist-body .link {
-    font-size: 12px; color: var(--muted); word-break: break-all;
+    font-size: 12.5px; color: var(--muted); word-break: break-all;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
-  .hist-time { font-size: 11px; color: #64748b; }
+  .hist-time { font-size: 11px; color: var(--muted2); }
   .icon-btn {
-    width: 36px; height: 36px; border-radius: 10px;
-    border: none; background: #0b1220; color: var(--muted);
+    width: var(--touch); height: var(--touch); border-radius: 14px;
+    border: 1px solid rgba(148,163,184,0.14); background: var(--bg-elevated); color: var(--muted);
     font-size: 16px; cursor: pointer; flex-shrink: 0;
   }
-  .section-head {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 4px;
+  .icon-btn:active { background: #1e293b; }
+  .empty {
+    color: var(--muted); font-size: 13px; padding: 22px 12px; text-align: center;
+    background: var(--bg-elevated); border-radius: 14px; border: 1px dashed rgba(148,163,184,0.22);
   }
-  .section-head h2 { margin: 0; font-size: 14px; }
-  .empty { color: var(--muted); font-size: 13px; padding: 8px 0; text-align: center; }
   .toast-inline {
-    display: none; margin-top: 8px; font-size: 12px; color: var(--ok); font-weight: 600;
+    display: none; margin-top: 12px; font-size: 12.5px; color: var(--ok); font-weight: 700;
   }
   footer {
-    text-align: center; color: #64748b; font-size: 11px; margin-top: 8px; padding: 8px;
+    text-align: center; color: var(--muted2); font-size: 11px; margin-top: 12px; padding: 8px;
   }
+  .status-bar {
+    position: sticky; bottom: 0; z-index: 5;
+    margin: 18px -2px 0; padding: 12px 16px;
+    background: rgba(12, 19, 32, 0.94); backdrop-filter: blur(14px);
+    border: 1px solid var(--card-border); border-radius: 999px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+  }
+  .status-bar .left {
+    display: flex; align-items: center; gap: 10px; min-width: 0;
+    font-size: 12.5px; color: var(--muted); font-weight: 650;
+  }
+  .status-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    background: var(--ali); box-shadow: 0 0 0 3px rgba(255,122,26,0.28);
+  }
+  .status-dot.baidu { background: var(--baidu); box-shadow: 0 0 0 3px rgba(59,69,240,0.28); }
+  .status-dot.quark { background: var(--quark); box-shadow: 0 0 0 3px rgba(20,184,166,0.28); }
+  .status-bar .right { font-size: 11px; color: var(--muted2); white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -151,15 +264,19 @@
       <h1>网盘转存</h1>
       <p>识别分享 · 历史 · 唤起官方 App</p>
     </div>
+    <span class="ver-pill">v1.1.0</span>
   </header>
 
-  <div class="card note">
-    <strong>说明：</strong>同盘转存最稳；跨盘官方不支持直接秒传。本版先做识别、历史与唤起；后续可接自动转存。不会收集密码 / Token / Cookie。
+  <div class="tip">
+    <div class="tip-icon">ℹ</div>
+    <div>
+      <strong>本版不做自动登录转存。</strong>可识别链接与提取码、保存历史、打开官方 App 或复制助手指令。同盘转存最稳；不会收集密码 / Token / Cookie。
+    </div>
   </div>
 
   <div class="card">
     <div class="label">粘贴分享文本（链接 + 提取码）</div>
-    <textarea id="shareInput" placeholder="例如：&#10;链接: https://pan.baidu.com/s/1xxxx&#10;提取码: abcd&#10;&#10;或阿里云盘 / 夸克 / UC 分享文案"></textarea>
+    <textarea id="shareInput" placeholder="例如：&#10;链接: https://pan.baidu.com/s/1xxxx&#10;提取码: abcd&#10;&#10;也可从其他 App 分享到本应用"></textarea>
     <div class="row">
       <button class="btn primary" id="btnParse">识别解析</button>
       <button class="btn ghost" id="btnPaste">从剪贴板粘贴</button>
@@ -170,9 +287,9 @@
   <div class="card">
     <div class="label">默认目标盘（转存指令用）</div>
     <div class="chips" id="diskChips">
-      <button class="chip active" data-disk="ali" type="button">阿里云盘</button>
-      <button class="chip" data-disk="baidu" type="button">百度网盘</button>
-      <button class="chip" data-disk="quark" type="button">夸克</button>
+      <button class="chip active" data-disk="ali" type="button"><span class="dot"></span>阿里云盘</button>
+      <button class="chip" data-disk="baidu" type="button"><span class="dot"></span>百度网盘</button>
+      <button class="chip" data-disk="quark" type="button"><span class="dot"></span>夸克</button>
     </div>
   </div>
 
@@ -181,14 +298,14 @@
       <h2>解析结果</h2>
       <span id="providerBadge" class="badge unknown">未知</span>
     </div>
-    <div class="result-grid" style="margin-top:10px">
+    <div class="result-grid" style="margin-top:14px">
       <div class="field"><div class="k">链接</div><div class="v" id="outLink">—</div></div>
       <div class="field"><div class="k">提取码</div><div class="v" id="outCode">（无）</div></div>
     </div>
     <div class="row">
       <button class="btn primary" id="btnOpen">打开链接</button>
-      <button class="btn" id="btnCopyLink">复制链接</button>
-      <button class="btn" id="btnCopyCode">复制提取码</button>
+      <button class="btn soft" id="btnCopyLink">复制链接</button>
+      <button class="btn soft" id="btnCopyCode">复制提取码</button>
     </div>
     <div class="row">
       <button class="btn ghost" id="btnCopyAssist">复制「助手转存指令」</button>
@@ -200,12 +317,20 @@
   <div class="card">
     <div class="section-head">
       <h2>历史记录</h2>
-      <button class="btn ghost" id="btnClearHist" style="flex:0;padding:6px 10px">清空</button>
+      <button class="btn ghost compact" id="btnClearHist">清空</button>
     </div>
-    <div id="histList"><div class="empty">暂无历史</div></div>
+    <div id="histList" style="margin-top:10px"><div class="empty">暂无历史 · 解析成功后自动保存</div></div>
   </div>
 
-  <footer>v1.0.0 · com.shicheng.pantransfer · 仅本地存储</footer>
+  <div class="status-bar" id="statusBar">
+    <div class="left">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">默认目标：阿里云盘</span>
+    </div>
+    <div class="right">仅本地存储</div>
+  </div>
+
+  <footer>v1.1.0 · com.shicheng.pantransfer · 不连网盘账号</footer>
 </div>
 
 <script>
@@ -224,8 +349,10 @@
   const providerBadge = $('providerBadge');
   const histList = $('histList');
   const actionHint = $('actionHint');
+  const statusDot = $('statusDot');
+  const statusText = $('statusText');
 
-  let current = null; // { provider, link, code, raw }
+  let current = null;
   let targetDisk = localStorage.getItem(DISK_KEY) || 'ali';
 
   function hasBridge() {
@@ -271,7 +398,6 @@
     window.open(url, '_blank');
   }
 
-  // -------- parsing --------
   const URL_RE = /https?:\/\/[^\s<>"'\u3000\uFF0C\u3001\u3002）)】\]]+/gi;
 
   function cleanUrl(u) {
@@ -289,7 +415,6 @@
 
   function extractCode(text, url) {
     if (!text) return '';
-    // from URL query
     if (url) {
       try {
         const q = new URL(url);
@@ -357,13 +482,15 @@
     }
     renderResult(parsed);
     if (save !== false) addHistory(parsed);
+    resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  // -------- target disk --------
   function syncChips() {
     document.querySelectorAll('#diskChips .chip').forEach(el => {
       el.classList.toggle('active', el.dataset.disk === targetDisk);
     });
+    statusDot.className = 'status-dot ' + (targetDisk === 'ali' ? '' : targetDisk);
+    statusText.textContent = '默认目标：' + (DISK_LABEL[targetDisk] || targetDisk);
   }
   document.querySelectorAll('#diskChips .chip').forEach(el => {
     el.addEventListener('click', () => {
@@ -375,7 +502,6 @@
   });
   syncChips();
 
-  // -------- history --------
   function loadHistory() {
     try {
       const arr = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
@@ -409,7 +535,7 @@
   function renderHistory() {
     const arr = loadHistory();
     if (!arr.length) {
-      histList.innerHTML = '<div class="empty">暂无历史</div>';
+      histList.innerHTML = '<div class="empty">暂无历史 · 解析成功后自动保存</div>';
       return;
     }
     histList.innerHTML = arr.map((h, i) => {
@@ -455,7 +581,6 @@
     }
   });
 
-  // -------- actions --------
   $('btnParse').addEventListener('click', () => doParse(true));
   $('btnClearInput').addEventListener('click', () => {
     shareInput.value = '';
@@ -513,12 +638,10 @@
     }
   });
 
-  // live parse on paste into textarea
   shareInput.addEventListener('paste', () => {
     setTimeout(() => doParse(true), 50);
   });
 
-  // Android share intent / pending text
   window.__onSharedText = function (text) {
     if (!text) return;
     shareInput.value = text;
@@ -534,10 +657,7 @@
   }
 
   renderHistory();
-  // slight delay so WebView bridge is ready
   setTimeout(pullPendingShare, 120);
-
-  // auto-parse if input prefilled
   if (shareInput.value.trim()) doParse(false);
 })();
 </script>
