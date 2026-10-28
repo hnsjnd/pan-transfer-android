@@ -2,53 +2,75 @@
 
 包名：`com.shicheng.pantransfer`  
 显示名：网盘转存  
-版本：1.1.0
+版本：**1.2.0**（versionCode 3）
 
-帮助你从百度 / 阿里云盘 / 夸克（及 UC）分享文案中识别链接与提取码，保存历史，并一键唤起官方 App 或复制「助手转存指令」。
+跨盘转存到阿里云盘是核心能力：夸克分享 → 自己的阿里云盘；阿里分享 → 自己的阿里（同盘）。
 
-## 安装到手机（侧载 Debug APK）
+## 安装
 
-1. 将 `dist/网盘转存.apk`（或 `dist/pan-transfer.apk`）传到手机（微信/电脑/数据线均可）。
-2. 打开 APK。若系统提示「禁止未知来源」，到 **设置 → 安全 / 应用** 中允许当前安装来源（如文件管理器、浏览器）。
-3. 安装完成后打开「网盘转存」。
-4. 本包为 **debug 签名**，可直接侧载；卸载后重装不会保留本地历史（历史存在 App 内 localStorage）。
+1. 下载 Release 中的 `pan-transfer.apk`（或 `dist/网盘转存.apk`）。
+2. 侧载安装；若提示未知来源，在系统设置中允许当前安装来源。
+3. 本包为 **debug 签名**。
 
-## 使用
+## 使用前：登录（必做）
 
-1. 粘贴分享文本，点 **识别解析**；也可从其他 App **分享到本 App**，或用「从剪贴板粘贴」。
-2. 选择默认目标盘（阿里云盘 / 百度 / 夸克），用于生成助手指令。
-3. 可 **打开链接**（唤起浏览器或已装网盘 App）、**复制链接 / 提取码**、复制 **助手转存指令**。
-4. 历史约保留最近 50 条，可单条删除或清空。
+Token / Cookie **只保存在手机本地**（EncryptedSharedPreferences），**不会**发到第三方服务器。
 
-## 本版限制（请知悉）
+### 阿里云盘（目标盘，必登）
 
-- **本版不做自动登录转存**；可识别链接与提取码、保存历史、打开官方 App 或复制助手指令。
-- **同盘转存最稳**；跨盘官方不支持直接秒传。
-- 本版只做 **识别、历史、唤起与复制**，**不做**自动登录、Cookie/Token 采集或非官方秒传接口。
-- 打开链接依赖系统 Intent；未安装对应网盘 App 时会用浏览器打开。
-- 剪贴板「读取」在部分 WebView 环境受限；可用长按粘贴，或从其他 App 分享进来。
+任选其一：
 
-## 后续可接（自动转存）
+1. App 内点 **登录** → 网页扫码/短信登录；成功后自动抓取 `refresh_token`。
+2. 或粘贴 `refresh_token`（可从浏览器登录阿里云盘后，在开发者工具 Application → Local Storage 中找到含 `refresh_token` 的 JSON）。
 
-- 官方 OAuth / 开放平台授权（优先）。
-- 用户自建中转服务（用户自持 Token，App 只发链接与提取码）。
-- 同盘「转存到自己的盘」自动化；跨盘仍需下载再上传或官方中转能力。
+登录后可见昵称；**退出**会清除本地 token。
+
+### 夸克（跨盘来源）
+
+1. 点 **登录** → 在 WebView 打开 `pan.quark.cn` 完成登录。
+2. 点 **完成并保存 Cookie**；App 会校验并加密保存。
+
+## 功能
+
+| 场景 | 行为 |
+|------|------|
+| **阿里分享 → 自己的阿里** | 同盘官方转存（get_share_token → list → copy/batch），保存到根目录文件夹「网盘转存」 |
+| **夸克分享 → 自己的阿里** | 无官方秒传：用夸克 Cookie 解析分享 → 转存到自己的夸克临时目录 → 取下载链 → 本机下载 → 上传到阿里「网盘转存」；有进度条 |
+| 识别 / 历史 / 分享到 App / 打开官方链接 | 保留 |
+
+### 体积限制（手机端诚实约束）
+
+- **> 500MB**：弹窗确认（流量与耗时警告）
+- **> 2GB**：拒绝在手机端处理，请改用电脑
+
+跨盘 **不是秒传**，速度受手机网络与双端限速影响。
+
+## 本版明确不做 / 未完成
+
+- **不宣称跨盘秒传**
+- 百度 → 阿里：UI 可识别链接，自动跨盘路径 **未接入**（可用打开链接 / 助手指令）
+- 不自选转存目录（固定「网盘转存」）
+- 不做演示模式 / 假成功
 
 ## 开发构建
 
-环境：JDK 17、Android SDK（`ANDROID_HOME`/`ANDROID_SDK_ROOT`）、本仓库 Gradle Wrapper。
-
 ```bash
-export JAVA_HOME=/workspace/jdk-17   # 或本机 JDK 17+
+export JAVA_HOME=/workspace/jdk-17
 export ANDROID_HOME=/workspace/android-sdk
 export ANDROID_SDK_ROOT=$ANDROID_HOME
 cd /workspace/pan-transfer-android
 ./gradlew assembleDebug
-# 产物：app/build/outputs/apk/debug/网盘转存-1.1.0-debug.apk
+# 产物：app/build/outputs/apk/debug/网盘转存-1.2.0-debug.apk
+# 复制：dist/网盘转存.apk 与 dist/pan-transfer.apk
 ```
 
 ## 实现说明
 
-- 原生壳：单 Activity + WebView，加载 `assets/index.html`。
-- 识别与历史：纯前端；偏好与历史存 `localStorage`。
-- 打开外链 / 复制：经 `AndroidBridge` JS 接口调用系统 Intent 与剪贴板。
+- 原生壳：`MainActivity` WebView + `AndroidBridge`；`LoginActivity` 负责网页登录 / Cookie 捕获。
+- 网络：OkHttp 调用阿里个人盘 API、夸克 Cookie API。
+- 存储：`SecureStore`（EncryptedSharedPreferences）。
+- 前端：`assets/index.html` 深色 UI；账号区 + 转存进度。
+
+## 仓库
+
+https://github.com/hnsjnd/pan-transfer-android

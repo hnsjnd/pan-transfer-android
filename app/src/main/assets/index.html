@@ -111,6 +111,13 @@
     font-size: 12.5px; line-height: 1.6; margin-bottom: 16px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   }
+  .tip.info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(99, 102, 241, 0.05));
+    border-color: rgba(59, 130, 246, 0.35);
+    color: #bfdbfe;
+  }
+  .tip.info .tip-icon { background: rgba(59, 130, 246, 0.25); }
+  .tip.info strong { color: #93c5fd; }
   .tip .tip-icon {
     width: 30px; height: 30px; border-radius: 10px; flex-shrink: 0;
     background: rgba(251, 191, 36, 0.22); display: grid; place-items: center; font-size: 15px;
@@ -118,7 +125,7 @@
   .tip strong { color: #fbbf24; }
 
   textarea#shareInput {
-    width: 100%; min-height: 140px; resize: vertical;
+    width: 100%; min-height: 120px; resize: vertical;
     background: var(--bg-elevated); color: var(--text);
     border: 1px solid rgba(148,163,184,0.2); border-radius: 16px;
     padding: 14px 16px; font-size: 14.5px; line-height: 1.6;
@@ -147,6 +154,10 @@
     font-size: 15px; font-weight: 800; letter-spacing: 0.02em;
     flex: 1 1 100%;
   }
+  .btn.primary.ali-cta {
+    background: linear-gradient(135deg, #ff8a3d, #ff7a1a);
+    box-shadow: 0 10px 28px rgba(255,122,26,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
   .btn.primary:active { background: var(--primary-press); }
   .btn.ghost {
     background: transparent; border: 1px solid rgba(148,163,184,0.24); color: var(--text);
@@ -154,6 +165,10 @@
   .btn.soft {
     background: rgba(59, 130, 246, 0.14); color: #bfdbfe;
     border: 1px solid rgba(59, 130, 246, 0.32);
+  }
+  .btn.danger-soft {
+    background: rgba(248, 113, 113, 0.12); color: #fecaca;
+    border: 1px solid rgba(248, 113, 113, 0.3);
   }
   .btn:disabled { opacity: 0.4; pointer-events: none; }
   .btn.compact { flex: 0 0 auto; min-height: 36px; padding: 6px 12px; font-size: 12px; }
@@ -185,6 +200,24 @@
     background: var(--quark-soft); color: #5eead4; border-color: rgba(20,184,166,0.35);
   }
 
+  .acct-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid rgba(148,163,184,0.1);
+  }
+  .acct-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .acct-row:first-child { padding-top: 0; }
+  .acct-icon {
+    width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+    display: grid; place-items: center; font-size: 18px; font-weight: 800; color: #fff;
+  }
+  .acct-icon.ali { background: linear-gradient(135deg, #ff8a3d, var(--ali)); }
+  .acct-icon.quark { background: linear-gradient(135deg, #2dd4bf, var(--quark)); }
+  .acct-body { flex: 1; min-width: 0; }
+  .acct-body .name { font-weight: 750; font-size: 14px; }
+  .acct-body .meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .acct-body .meta.on { color: var(--ok); }
+  .acct-body .meta.off { color: var(--muted2); }
+
   .result-grid { display: grid; gap: 10px; }
   .field {
     background: var(--bg-elevated); border-radius: 14px; padding: 13px 15px;
@@ -206,6 +239,24 @@
   .badge.quark { background: linear-gradient(135deg, #2dd4bf, var(--quark)); }
   .badge.uc { background: linear-gradient(135deg, #fdba74, var(--uc)); }
   .badge.unknown { background: #64748b; }
+
+  .progress-wrap {
+    display: none; margin-top: 14px;
+    background: var(--bg-elevated); border-radius: 14px; padding: 14px;
+    border: 1px solid rgba(148,163,184,0.14);
+  }
+  .progress-wrap.show { display: block; }
+  .progress-bar {
+    height: 8px; border-radius: 999px; background: #1e293b; overflow: hidden; margin: 10px 0 8px;
+  }
+  .progress-bar > i {
+    display: block; height: 100%; width: 0%;
+    background: linear-gradient(90deg, #ff8a3d, #3b82f6);
+    border-radius: 999px; transition: width .2s;
+  }
+  .progress-detail { font-size: 12.5px; color: var(--muted); }
+  .progress-detail.err { color: var(--danger); }
+  .progress-detail.ok { color: var(--ok); }
 
   .hist-item {
     display: flex; gap: 10px; align-items: flex-start;
@@ -254,6 +305,13 @@
   .status-dot.baidu { background: var(--baidu); box-shadow: 0 0 0 3px rgba(59,69,240,0.28); }
   .status-dot.quark { background: var(--quark); box-shadow: 0 0 0 3px rgba(20,184,166,0.28); }
   .status-bar .right { font-size: 11px; color: var(--muted2); white-space: nowrap; }
+  .token-box { display:none; margin-top: 10px; }
+  .token-box.show { display:block; }
+  .token-box input {
+    width: 100%; background: var(--bg-elevated); color: var(--text);
+    border: 1px solid rgba(148,163,184,0.2); border-radius: 12px;
+    padding: 12px; font-size: 13px; outline: none;
+  }
 </style>
 </head>
 <body>
@@ -262,21 +320,51 @@
     <div class="logo">☁</div>
     <div class="titles">
       <h1>网盘转存</h1>
-      <p>识别分享 · 历史 · 唤起官方 App</p>
+      <p>同盘秒存 · 跨盘下载上传到阿里</p>
     </div>
-    <span class="ver-pill">v1.1.0</span>
+    <span class="ver-pill">v1.2.0</span>
   </header>
 
-  <div class="tip">
+  <div class="tip info">
     <div class="tip-icon">ℹ</div>
     <div>
-      <strong>本版不做自动登录转存。</strong>可识别链接与提取码、保存历史、打开官方 App 或复制助手指令。同盘转存最稳；不会收集密码 / Token / Cookie。
+      <strong>跨盘不是秒传。</strong>阿里同盘可用官方转存接口；夸克→阿里需登录两边后「下载再上传」，大文件在手机上会慢。Token / Cookie 仅存本机加密区，不上传第三方。
+    </div>
+  </div>
+
+  <div class="card" id="accountCard">
+    <div class="section-head">
+      <h2>账号</h2>
+    </div>
+    <div class="acct-row">
+      <div class="acct-icon ali">阿</div>
+      <div class="acct-body">
+        <div class="name">阿里云盘（目标盘）</div>
+        <div class="meta off" id="aliMeta">未登录</div>
+      </div>
+      <button class="btn soft compact" id="btnAliLogin">登录</button>
+      <button class="btn danger-soft compact" id="btnAliLogout" style="display:none">退出</button>
+    </div>
+    <div class="token-box" id="aliTokenBox">
+      <input id="aliTokenInput" placeholder="也可粘贴 refresh_token 后点下方确认" />
+      <div class="row" style="margin-top:8px">
+        <button class="btn soft" id="btnAliToken">用 refresh_token 登录</button>
+      </div>
+    </div>
+    <div class="acct-row">
+      <div class="acct-icon quark">夸</div>
+      <div class="acct-body">
+        <div class="name">夸克网盘（跨盘来源）</div>
+        <div class="meta off" id="quarkMeta">未登录</div>
+      </div>
+      <button class="btn soft compact" id="btnQuarkLogin">登录</button>
+      <button class="btn danger-soft compact" id="btnQuarkLogout" style="display:none">退出</button>
     </div>
   </div>
 
   <div class="card">
     <div class="label">粘贴分享文本（链接 + 提取码）</div>
-    <textarea id="shareInput" placeholder="例如：&#10;链接: https://pan.baidu.com/s/1xxxx&#10;提取码: abcd&#10;&#10;也可从其他 App 分享到本应用"></textarea>
+    <textarea id="shareInput" placeholder="例如：&#10;https://pan.quark.cn/s/xxxx&#10;提取码: abcd&#10;&#10;或阿里云盘分享链接；也可从其他 App 分享到本应用"></textarea>
     <div class="row">
       <button class="btn primary" id="btnParse">识别解析</button>
       <button class="btn ghost" id="btnPaste">从剪贴板粘贴</button>
@@ -285,7 +373,7 @@
   </div>
 
   <div class="card">
-    <div class="label">默认目标盘（转存指令用）</div>
+    <div class="label">默认目标盘</div>
     <div class="chips" id="diskChips">
       <button class="chip active" data-disk="ali" type="button"><span class="dot"></span>阿里云盘</button>
       <button class="chip" data-disk="baidu" type="button"><span class="dot"></span>百度网盘</button>
@@ -301,15 +389,24 @@
     <div class="result-grid" style="margin-top:14px">
       <div class="field"><div class="k">链接</div><div class="v" id="outLink">—</div></div>
       <div class="field"><div class="k">提取码</div><div class="v" id="outCode">（无）</div></div>
+      <div class="field"><div class="k">转存方式</div><div class="v" id="outMode">—</div></div>
     </div>
     <div class="row">
-      <button class="btn primary" id="btnOpen">打开链接</button>
+      <button class="btn primary ali-cta" id="btnTransfer">转存到阿里云盘</button>
+    </div>
+    <div class="row">
+      <button class="btn soft" id="btnOpen">打开链接</button>
       <button class="btn soft" id="btnCopyLink">复制链接</button>
       <button class="btn soft" id="btnCopyCode">复制提取码</button>
     </div>
     <div class="row">
       <button class="btn ghost" id="btnCopyAssist">复制「助手转存指令」</button>
       <button class="btn ghost" id="btnSaveHist">存入历史</button>
+      <button class="btn danger-soft" id="btnCancelXfer" style="display:none">取消转存</button>
+    </div>
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-detail" id="progressDetail">准备中…</div>
+      <div class="progress-bar"><i id="progressBar"></i></div>
     </div>
     <div class="toast-inline" id="actionHint"></div>
   </div>
@@ -327,10 +424,10 @@
       <span class="status-dot" id="statusDot"></span>
       <span id="statusText">默认目标：阿里云盘</span>
     </div>
-    <div class="right">仅本地存储</div>
+    <div class="right" id="statusRight">Token 仅本机</div>
   </div>
 
-  <footer>v1.1.0 · com.shicheng.pantransfer · 不连网盘账号</footer>
+  <footer>v1.2.0 · com.shicheng.pantransfer · 跨盘=下载+上传（非秒传）</footer>
 </div>
 
 <script>
@@ -346,14 +443,20 @@
   const resultCard = $('resultCard');
   const outLink = $('outLink');
   const outCode = $('outCode');
+  const outMode = $('outMode');
   const providerBadge = $('providerBadge');
   const histList = $('histList');
   const actionHint = $('actionHint');
   const statusDot = $('statusDot');
   const statusText = $('statusText');
+  const progressWrap = $('progressWrap');
+  const progressBar = $('progressBar');
+  const progressDetail = $('progressDetail');
 
   let current = null;
   let targetDisk = localStorage.getItem(DISK_KEY) || 'ali';
+  let accounts = { aliLoggedIn: false, quarkLoggedIn: false };
+  let transferring = false;
 
   function hasBridge() {
     return typeof AndroidBridge !== 'undefined' && AndroidBridge;
@@ -459,6 +562,80 @@
     return { provider, link, code, raw: text };
   }
 
+  function modeText(provider) {
+    if (provider === 'ali') {
+      return accounts.aliLoggedIn
+        ? '阿里同盘一键转存 →「网盘转存」文件夹'
+        : '需先登录阿里云盘（同盘官方转存）';
+    }
+    if (provider === 'quark') {
+      if (accounts.quarkLoggedIn && accounts.aliLoggedIn) {
+        return '夸克→阿里：先转存到自己的夸克，再下载上传（非秒传）';
+      }
+      return '需登录夸克 + 阿里云盘后才能跨盘';
+    }
+    if (provider === 'baidu') return '百度→阿里跨盘暂未接入（可用打开链接 / 助手指令）';
+    return '未知来源，仅支持打开 / 复制';
+  }
+
+  function updateTransferButton() {
+    const btn = $('btnTransfer');
+    if (!current) return;
+    const p = current.provider;
+    outMode.textContent = modeText(p);
+    let enable = false;
+    let label = '转存到阿里云盘';
+    if (p === 'ali' && accounts.aliLoggedIn) {
+      enable = true;
+      label = '阿里同盘一键转存';
+    } else if (p === 'quark' && accounts.quarkLoggedIn && accounts.aliLoggedIn) {
+      enable = true;
+      label = '夸克 → 转存到阿里云盘';
+    } else if (p === 'ali') {
+      label = '请先登录阿里云盘';
+    } else if (p === 'quark') {
+      label = '请先登录夸克与阿里云盘';
+    } else {
+      label = '此来源暂不支持自动转存';
+    }
+    btn.textContent = label;
+    btn.disabled = !enable || transferring;
+  }
+
+  function renderAccounts() {
+    const aliOn = !!accounts.aliLoggedIn;
+    const qOn = !!accounts.quarkLoggedIn;
+    const aliMeta = $('aliMeta');
+    const quarkMeta = $('quarkMeta');
+    aliMeta.textContent = aliOn ? ('已登录 · ' + (accounts.aliNick || '阿里用户')) : '未登录';
+    aliMeta.className = 'meta ' + (aliOn ? 'on' : 'off');
+    quarkMeta.textContent = qOn ? ('已登录' + (accounts.quarkNick ? ' · ' + accounts.quarkNick : '')) : '未登录';
+    quarkMeta.className = 'meta ' + (qOn ? 'on' : 'off');
+    $('btnAliLogin').style.display = aliOn ? 'none' : '';
+    $('btnAliLogout').style.display = aliOn ? '' : 'none';
+    $('aliTokenBox').classList.toggle('show', !aliOn);
+    $('btnQuarkLogin').style.display = qOn ? 'none' : '';
+    $('btnQuarkLogout').style.display = qOn ? '' : 'none';
+    $('statusRight').textContent = (aliOn ? '阿✓' : '阿✗') + ' ' + (qOn ? '夸✓' : '夸✗') + ' · 仅本机';
+    updateTransferButton();
+  }
+
+  function applyAccounts(raw) {
+    try {
+      const o = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      accounts = o || accounts;
+    } catch (e) {}
+    renderAccounts();
+  }
+
+  function refreshAccounts() {
+    if (!hasBridge()) { renderAccounts(); return; }
+    try {
+      const s = AndroidBridge.getAccountStatus();
+      applyAccounts(s);
+    } catch (e) { renderAccounts(); }
+  }
+
   function renderResult(parsed) {
     current = parsed;
     if (!parsed) {
@@ -471,6 +648,7 @@
     const p = parsed.provider;
     providerBadge.className = 'badge ' + (p || 'unknown');
     providerBadge.textContent = PROVIDER_LABEL[p] || '未知';
+    updateTransferButton();
   }
 
   function doParse(save) {
@@ -581,6 +759,38 @@
     }
   });
 
+  function setProgress(show, percent, detail, cls) {
+    progressWrap.classList.toggle('show', !!show);
+    if (percent != null) progressBar.style.width = Math.max(0, Math.min(100, percent)) + '%';
+    if (detail != null) {
+      progressDetail.textContent = detail;
+      progressDetail.className = 'progress-detail' + (cls ? ' ' + cls : '');
+    }
+    $('btnCancelXfer').style.display = transferring ? '' : 'none';
+  }
+
+  function startTransfer(force) {
+    if (!current || !hasBridge()) {
+      toast('请在 App 内使用转存');
+      return;
+    }
+    const p = current.provider;
+    if (p !== 'ali' && p !== 'quark') {
+      toast('此来源暂不支持自动转存');
+      return;
+    }
+    transferring = true;
+    updateTransferButton();
+    setProgress(true, 2, '开始转存…');
+    try {
+      AndroidBridge.startTransfer(p, current.link, current.code || '', !!force);
+    } catch (e) {
+      transferring = false;
+      updateTransferButton();
+      setProgress(true, 0, '启动失败：' + e, 'err');
+    }
+  }
+
   $('btnParse').addEventListener('click', () => doParse(true));
   $('btnClearInput').addEventListener('click', () => {
     shareInput.value = '';
@@ -638,6 +848,34 @@
     }
   });
 
+  $('btnTransfer').addEventListener('click', () => startTransfer(false));
+  $('btnCancelXfer').addEventListener('click', () => {
+    if (hasBridge()) {
+      try { AndroidBridge.cancelTransfer(); } catch (e) {}
+    }
+    toast('已请求取消');
+  });
+
+  $('btnAliLogin').addEventListener('click', () => {
+    if (hasBridge()) AndroidBridge.loginAliyun();
+    else toast('请在 App 内登录');
+  });
+  $('btnAliLogout').addEventListener('click', () => {
+    if (hasBridge()) AndroidBridge.logoutAliyun();
+  });
+  $('btnAliToken').addEventListener('click', () => {
+    const t = $('aliTokenInput').value.trim();
+    if (!t) { toast('请粘贴 refresh_token'); return; }
+    if (hasBridge()) AndroidBridge.loginAliyunToken(t);
+  });
+  $('btnQuarkLogin').addEventListener('click', () => {
+    if (hasBridge()) AndroidBridge.loginQuark();
+    else toast('请在 App 内登录');
+  });
+  $('btnQuarkLogout').addEventListener('click', () => {
+    if (hasBridge()) AndroidBridge.logoutQuark();
+  });
+
   shareInput.addEventListener('paste', () => {
     setTimeout(() => doParse(true), 50);
   });
@@ -646,6 +884,53 @@
     if (!text) return;
     shareInput.value = text;
     doParse(true);
+  };
+
+  window.__onAccountsChanged = function (json) {
+    applyAccounts(json);
+  };
+
+  window.__onTransferProgress = function (json) {
+    try {
+      const o = typeof json === 'string' ? JSON.parse(json) : json;
+      transferring = true;
+      updateTransferButton();
+      setProgress(true, o.percent || 0, o.detail || o.stage || '进行中…');
+    } catch (e) {}
+  };
+
+  window.__onTransferDone = function (json) {
+    transferring = false;
+    updateTransferButton();
+    try {
+      const o = typeof json === 'string' ? JSON.parse(json) : json;
+      setProgress(true, 100, o.message || '完成', 'ok');
+      toast(o.message || '转存完成');
+    } catch (e) {
+      setProgress(true, 100, '完成', 'ok');
+    }
+    refreshAccounts();
+  };
+
+  window.__onTransferError = function (json) {
+    transferring = false;
+    updateTransferButton();
+    try {
+      const o = typeof json === 'string' ? JSON.parse(json) : json;
+      if (o.needConfirm) {
+        if (confirm(o.message || '文件较大，确认继续？')) {
+          startTransfer(true);
+          return;
+        }
+        setProgress(true, 0, '已取消（文件较大）', 'err');
+        return;
+      }
+      setProgress(true, 0, o.message || '失败', 'err');
+      toast(o.message || '转存失败');
+    } catch (e) {
+      setProgress(true, 0, String(json), 'err');
+    }
+    refreshAccounts();
   };
 
   function pullPendingShare() {
@@ -657,7 +942,9 @@
   }
 
   renderHistory();
+  refreshAccounts();
   setTimeout(pullPendingShare, 120);
+  setTimeout(refreshAccounts, 400);
   if (shareInput.value.trim()) doParse(false);
 })();
 </script>
