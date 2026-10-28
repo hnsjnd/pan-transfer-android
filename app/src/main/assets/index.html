@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<title>网盘转存</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --bg3: #334155;
+    --card: #1e293b;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --primary: #3b82f6;
+    --primary-press: #2563eb;
+    --ok: #22c55e;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --baidu: #2932e1;
+    --ali: #ff6a00;
+    --quark: #0d9488;
+    --uc: #f97316;
+    --radius: 14px;
+    --pad: 16px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 15px; line-height: 1.45;
+    min-height: 100%;
+  }
+  body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 12px 14px 28px; }
+  header.appbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 2px 14px;
+  }
+  .logo {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    display: grid; place-items: center; font-size: 20px; flex-shrink: 0;
+  }
+  .titles h1 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0.02em; }
+  .titles p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+  .card {
+    background: var(--card); border: 1px solid #33415555;
+    border-radius: var(--radius); padding: var(--pad); margin-bottom: 12px;
+    box-shadow: 0 1px 0 #ffffff08 inset;
+  }
+  .label {
+    font-size: 12px; color: var(--muted); font-weight: 600;
+    margin-bottom: 8px; letter-spacing: 0.04em;
+  }
+  textarea#shareInput {
+    width: 100%; min-height: 120px; resize: vertical;
+    background: #0b1220; color: var(--text);
+    border: 1px solid var(--bg3); border-radius: 12px;
+    padding: 12px; font-size: 14px; line-height: 1.5;
+    outline: none; font-family: inherit;
+  }
+  textarea#shareInput:focus { border-color: var(--primary); box-shadow: 0 0 0 3px #3b82f633; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .btn {
+    appearance: none; border: none; cursor: pointer;
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 13px; font-weight: 600; color: #fff;
+    background: var(--bg3); transition: transform .08s, opacity .15s, background .15s;
+    flex: 1 1 auto; min-width: 0; text-align: center;
+  }
+  .btn:active { transform: scale(0.97); opacity: 0.9; }
+  .btn.primary { background: var(--primary); }
+  .btn.primary:active { background: var(--primary-press); }
+  .btn.ghost { background: transparent; border: 1px solid var(--bg3); color: var(--text); }
+  .btn:disabled { opacity: 0.4; pointer-events: none; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    border: 1px solid var(--bg3); background: #0b1220; color: var(--muted);
+    border-radius: 999px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer;
+  }
+  .chip.active { color: #fff; border-color: transparent; }
+  .chip[data-disk="ali"].active { background: var(--ali); }
+  .chip[data-disk="baidu"].active { background: var(--baidu); }
+  .chip[data-disk="quark"].active { background: var(--quark); }
+  .result-grid { display: grid; gap: 10px; }
+  .field {
+    background: #0b1220; border-radius: 10px; padding: 10px 12px;
+    border: 1px solid #33415544;
+  }
+  .field .k { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .field .v {
+    font-size: 13px; word-break: break-all; color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700;
+    color: #fff;
+  }
+  .badge.baidu { background: var(--baidu); }
+  .badge.ali { background: var(--ali); }
+  .badge.quark { background: var(--quark); }
+  .badge.uc { background: var(--uc); }
+  .badge.unknown { background: #64748b; }
+  .note {
+    background: #42200655; border: 1px solid #f59e0b44;
+    color: #fde68a; border-radius: 12px; padding: 12px 14px;
+    font-size: 12.5px; line-height: 1.55;
+  }
+  .note strong { color: #fbbf24; }
+  .hist-item {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 12px 0; border-bottom: 1px solid #33415544;
+  }
+  .hist-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .hist-body { flex: 1; min-width: 0; cursor: pointer; }
+  .hist-body .meta { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; flex-wrap: wrap; }
+  .hist-body .link {
+    font-size: 12px; color: var(--muted); word-break: break-all;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .hist-time { font-size: 11px; color: #64748b; }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    border: none; background: #0b1220; color: var(--muted);
+    font-size: 16px; cursor: pointer; flex-shrink: 0;
+  }
+  .section-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .section-head h2 { margin: 0; font-size: 14px; }
+  .empty { color: var(--muted); font-size: 13px; padding: 8px 0; text-align: center; }
+  .toast-inline {
+    display: none; margin-top: 8px; font-size: 12px; color: var(--ok); font-weight: 600;
+  }
+  footer {
+    text-align: center; color: #64748b; font-size: 11px; margin-top: 8px; padding: 8px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="appbar">
+    <div class="logo">☁</div>
+    <div class="titles">
+      <h1>网盘转存</h1>
+      <p>识别分享 · 历史 · 唤起官方 App</p>
+    </div>
+  </header>
+
+  <div class="card note">
+    <strong>说明：</strong>同盘转存最稳；跨盘官方不支持直接秒传。本版先做识别、历史与唤起；后续可接自动转存。不会收集密码 / Token / Cookie。
+  </div>
+
+  <div class="card">
+    <div class="label">粘贴分享文本（链接 + 提取码）</div>
+    <textarea id="shareInput" placeholder="例如：&#10;链接: https://pan.baidu.com/s/1xxxx&#10;提取码: abcd&#10;&#10;或阿里云盘 / 夸克 / UC 分享文案"></textarea>
+    <div class="row">
+      <button class="btn primary" id="btnParse">识别解析</button>
+      <button class="btn ghost" id="btnPaste">从剪贴板粘贴</button>
+      <button class="btn ghost" id="btnClearInput">清空</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">默认目标盘（转存指令用）</div>
+    <div class="chips" id="diskChips">
+      <button class="chip active" data-disk="ali" type="button">阿里云盘</button>
+      <button class="chip" data-disk="baidu" type="button">百度网盘</button>
+      <button class="chip" data-disk="quark" type="button">夸克</button>
+    </div>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none">
+    <div class="section-head">
+      <h2>解析结果</h2>
+      <span id="providerBadge" class="badge unknown">未知</span>
+    </div>
+    <div class="result-grid" style="margin-top:10px">
+      <div class="field"><div class="k">链接</div><div class="v" id="outLink">—</div></div>
+      <div class="field"><div class="k">提取码</div><div class="v" id="outCode">（无）</div></div>
+    </div>
+    <div class="row">
+      <button class="btn primary" id="btnOpen">打开链接</button>
+      <button class="btn" id="btnCopyLink">复制链接</button>
+      <button class="btn" id="btnCopyCode">复制提取码</button>
+    </div>
+    <div class="row">
+      <button class="btn ghost" id="btnCopyAssist">复制「助手转存指令」</button>
+      <button class="btn ghost" id="btnSaveHist">存入历史</button>
+    </div>
+    <div class="toast-inline" id="actionHint"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-head">
+      <h2>历史记录</h2>
+      <button class="btn ghost" id="btnClearHist" style="flex:0;padding:6px 10px">清空</button>
+    </div>
+    <div id="histList"><div class="empty">暂无历史</div></div>
+  </div>
+
+  <footer>v1.0.0 · com.shicheng.pantransfer · 仅本地存储</footer>
+</div>
+
+<script>
+(function () {
+  const DISK_LABEL = { ali: '阿里云盘', baidu: '百度网盘', quark: '夸克' };
+  const PROVIDER_LABEL = { baidu: '百度网盘', ali: '阿里云盘', quark: '夸克', uc: 'UC网盘', unknown: '未知' };
+  const HIST_KEY = 'pan_transfer_history_v1';
+  const DISK_KEY = 'pan_transfer_target_disk_v1';
+  const MAX_HIST = 50;
+
+  const $ = (id) => document.getElementById(id);
+  const shareInput = $('shareInput');
+  const resultCard = $('resultCard');
+  const outLink = $('outLink');
+  const outCode = $('outCode');
+  const providerBadge = $('providerBadge');
+  const histList = $('histList');
+  const actionHint = $('actionHint');
+
+  let current = null; // { provider, link, code, raw }
+  let targetDisk = localStorage.getItem(DISK_KEY) || 'ali';
+
+  function hasBridge() {
+    return typeof AndroidBridge !== 'undefined' && AndroidBridge;
+  }
+
+  function toast(msg) {
+    if (hasBridge()) {
+      try { AndroidBridge.toast(String(msg)); return; } catch (e) {}
+    }
+    actionHint.textContent = msg;
+    actionHint.style.display = 'block';
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => { actionHint.style.display = 'none'; }, 1800);
+  }
+
+  function copyText(text) {
+    const t = text == null ? '' : String(text);
+    if (hasBridge()) {
+      try { AndroidBridge.copyText(t); return; } catch (e) {}
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(t).then(() => toast('已复制')).catch(() => fallbackCopy(t));
+    } else {
+      fallbackCopy(t);
+    }
+  }
+
+  function fallbackCopy(t) {
+    const ta = document.createElement('textarea');
+    ta.value = t;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); toast('已复制'); } catch (e) { toast('复制失败'); }
+    document.body.removeChild(ta);
+  }
+
+  function openUrl(url) {
+    if (!url) return;
+    if (hasBridge()) {
+      try { AndroidBridge.openUrl(url); return; } catch (e) {}
+    }
+    window.open(url, '_blank');
+  }
+
+  // -------- parsing --------
+  const URL_RE = /https?:\/\/[^\s<>"'\u3000\uFF0C\u3001\u3002）)】\]]+/gi;
+
+  function cleanUrl(u) {
+    return u.replace(/[),.，。；;！!？?\]]+$/g, '');
+  }
+
+  function detectProvider(url) {
+    const u = (url || '').toLowerCase();
+    if (/pan\.baidu\.com|yun\.baidu\.com|baidu\.com\/s\//.test(u)) return 'baidu';
+    if (/aliyundrive\.com|alipan\.com/.test(u)) return 'ali';
+    if (/pan\.quark\.cn|quark\.cn\/s\//.test(u)) return 'quark';
+    if (/drive\.uc\.cn|uc\.cn\/s\//.test(u)) return 'uc';
+    return 'unknown';
+  }
+
+  function extractCode(text, url) {
+    if (!text) return '';
+    // from URL query
+    if (url) {
+      try {
+        const q = new URL(url);
+        const pwd = q.searchParams.get('pwd') || q.searchParams.get('password') || q.searchParams.get('passcode');
+        if (pwd) return pwd.trim();
+      } catch (e) {}
+      const mPwd = url.match(/[?&#](?:pwd|password|passcode)=([A-Za-z0-9]{3,8})/i);
+      if (mPwd) return mPwd[1];
+    }
+    const patterns = [
+      /提取码\s*[:：]\s*([A-Za-z0-9]{3,8})/i,
+      /密码\s*[:：]\s*([A-Za-z0-9]{3,8})/i,
+      /访问码\s*[:：]\s*([A-Za-z0-9]{3,8})/i,
+      /码\s*[:：]\s*([A-Za-z0-9]{3,8})/i,
+      /提取码\s+([A-Za-z0-9]{3,8})/i,
+      /密码\s+([A-Za-z0-9]{3,8})/i,
+      /（\s*提取码\s*[:：]?\s*([A-Za-z0-9]{3,8})\s*）/,
+      /\(\s*提取码\s*[:：]?\s*([A-Za-z0-9]{3,8})\s*\)/i,
+    ];
+    for (const re of patterns) {
+      const m = text.match(re);
+      if (m) return m[1];
+    }
+    return '';
+  }
+
+  function pickBestUrl(urls) {
+    if (!urls || !urls.length) return null;
+    const ranked = urls.map(cleanUrl).filter(Boolean);
+    const prefer = ranked.find(u => detectProvider(u) !== 'unknown');
+    return prefer || ranked[0];
+  }
+
+  function parseShareText(raw) {
+    const text = (raw || '').trim();
+    if (!text) return null;
+    const matches = text.match(URL_RE) || [];
+    const link = pickBestUrl(matches);
+    if (!link) return null;
+    const provider = detectProvider(link);
+    const code = extractCode(text, link);
+    return { provider, link, code, raw: text };
+  }
+
+  function renderResult(parsed) {
+    current = parsed;
+    if (!parsed) {
+      resultCard.style.display = 'none';
+      return;
+    }
+    resultCard.style.display = 'block';
+    outLink.textContent = parsed.link;
+    outCode.textContent = parsed.code || '（无）';
+    const p = parsed.provider;
+    providerBadge.className = 'badge ' + (p || 'unknown');
+    providerBadge.textContent = PROVIDER_LABEL[p] || '未知';
+  }
+
+  function doParse(save) {
+    const parsed = parseShareText(shareInput.value);
+    if (!parsed) {
+      toast('未识别到网盘分享链接');
+      renderResult(null);
+      return;
+    }
+    renderResult(parsed);
+    if (save !== false) addHistory(parsed);
+  }
+
+  // -------- target disk --------
+  function syncChips() {
+    document.querySelectorAll('#diskChips .chip').forEach(el => {
+      el.classList.toggle('active', el.dataset.disk === targetDisk);
+    });
+  }
+  document.querySelectorAll('#diskChips .chip').forEach(el => {
+    el.addEventListener('click', () => {
+      targetDisk = el.dataset.disk;
+      localStorage.setItem(DISK_KEY, targetDisk);
+      syncChips();
+      toast('默认目标：' + DISK_LABEL[targetDisk]);
+    });
+  });
+  syncChips();
+
+  // -------- history --------
+  function loadHistory() {
+    try {
+      const arr = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+
+  function saveHistory(arr) {
+    localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(0, MAX_HIST)));
+  }
+
+  function addHistory(item) {
+    const arr = loadHistory().filter(h => !(h.link === item.link && (h.code || '') === (item.code || '')));
+    arr.unshift({
+      provider: item.provider,
+      link: item.link,
+      code: item.code || '',
+      raw: item.raw || '',
+      ts: Date.now()
+    });
+    saveHistory(arr);
+    renderHistory();
+  }
+
+  function formatTime(ts) {
+    const d = new Date(ts);
+    const pad = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  function renderHistory() {
+    const arr = loadHistory();
+    if (!arr.length) {
+      histList.innerHTML = '<div class="empty">暂无历史</div>';
+      return;
+    }
+    histList.innerHTML = arr.map((h, i) => {
+      const badge = PROVIDER_LABEL[h.provider] || '未知';
+      const cls = h.provider || 'unknown';
+      const codeBit = h.code ? (' · 码 ' + escapeHtml(h.code)) : '';
+      return '<div class="hist-item" data-i="' + i + '">' +
+        '<div class="hist-body">' +
+          '<div class="meta"><span class="badge ' + cls + '">' + escapeHtml(badge) + '</span>' +
+          '<span class="hist-time">' + formatTime(h.ts) + codeBit + '</span></div>' +
+          '<div class="link">' + escapeHtml(h.link) + '</div>' +
+        '</div>' +
+        '<button class="icon-btn" data-del="' + i + '" title="删除">🗑</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  histList.addEventListener('click', (e) => {
+    const del = e.target.closest('[data-del]');
+    if (del) {
+      const i = +del.getAttribute('data-del');
+      const arr = loadHistory();
+      arr.splice(i, 1);
+      saveHistory(arr);
+      renderHistory();
+      toast('已删除');
+      return;
+    }
+    const body = e.target.closest('.hist-body');
+    if (body) {
+      const item = body.closest('.hist-item');
+      const i = +item.getAttribute('data-i');
+      const h = loadHistory()[i];
+      if (!h) return;
+      shareInput.value = h.raw || (h.link + (h.code ? ('\n提取码: ' + h.code) : ''));
+      renderResult({ provider: h.provider, link: h.link, code: h.code, raw: h.raw });
+      toast('已载入历史');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+
+  // -------- actions --------
+  $('btnParse').addEventListener('click', () => doParse(true));
+  $('btnClearInput').addEventListener('click', () => {
+    shareInput.value = '';
+    renderResult(null);
+  });
+  $('btnPaste').addEventListener('click', async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        const t = await navigator.clipboard.readText();
+        if (t) {
+          shareInput.value = t;
+          doParse(true);
+          return;
+        }
+      }
+    } catch (e) {}
+    toast('请长按输入框粘贴（浏览器限制读取剪贴板）');
+    shareInput.focus();
+  });
+
+  $('btnOpen').addEventListener('click', () => {
+    if (!current || !current.link) return;
+    openUrl(current.link);
+  });
+  $('btnCopyLink').addEventListener('click', () => {
+    if (!current) return;
+    copyText(current.link);
+  });
+  $('btnCopyCode').addEventListener('click', () => {
+    if (!current) return;
+    if (!current.code) { toast('无提取码'); return; }
+    copyText(current.code);
+  });
+  $('btnCopyAssist').addEventListener('click', () => {
+    if (!current) return;
+    const disk = DISK_LABEL[targetDisk] || targetDisk;
+    const lines = [
+      '请帮我转存到' + disk + '：',
+      '链接：' + current.link,
+      '提取码：' + (current.code || '无')
+    ];
+    copyText(lines.join('\n'));
+  });
+  $('btnSaveHist').addEventListener('click', () => {
+    if (!current) return;
+    addHistory(current);
+    toast('已存入历史');
+  });
+  $('btnClearHist').addEventListener('click', () => {
+    if (!loadHistory().length) return;
+    if (confirm('确定清空全部历史？')) {
+      saveHistory([]);
+      renderHistory();
+      toast('历史已清空');
+    }
+  });
+
+  // live parse on paste into textarea
+  shareInput.addEventListener('paste', () => {
+    setTimeout(() => doParse(true), 50);
+  });
+
+  // Android share intent / pending text
+  window.__onSharedText = function (text) {
+    if (!text) return;
+    shareInput.value = text;
+    doParse(true);
+  };
+
+  function pullPendingShare() {
+    if (!hasBridge()) return;
+    try {
+      const t = AndroidBridge.getPendingShare();
+      if (t) window.__onSharedText(t);
+    } catch (e) {}
+  }
+
+  renderHistory();
+  // slight delay so WebView bridge is ready
+  setTimeout(pullPendingShare, 120);
+
+  // auto-parse if input prefilled
+  if (shareInput.value.trim()) doParse(false);
+})();
+</script>
+</body>
+</html>
